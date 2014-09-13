@@ -1,15 +1,15 @@
 
-/****************************************************************/
-/*                                                              */
-/*  FILE NAME               :  menu.c                           */
-/*  PRINCIPAL AUTHOR        :  Suweijiang                       */
-/*  SUBSYSTEM NAME          :  menu                             */
-/*  MODULE NAME             :  menu                             */
-/*  LANGUAGE                :  C                                */
-/*  TARGET ENVIRONMENT      :  ANY                              */
-/*  DATE OF FIRST RELEASE   :  2014/09/09                       */
-/*  DESCRIPTION             :  This is a menu program           */
-/****************************************************************/
+/******************************************************************************/
+/*                                                                            */
+/*  FILE NAME               :  menu.c                                         */
+/*  PRINCIPAL AUTHOR        :  Suweijiang                                     */
+/*  SUBSYSTEM NAME          :  menu                                           */
+/*  MODULE NAME             :  menu                                           */
+/*  LANGUAGE                :  C                                              */
+/*  TARGET ENVIRONMENT      :  ANY                                            */
+/*  DATE OF FIRST RELEASE   :  2014/09/09                                     */
+/*  DESCRIPTION             :  This is a menu program                         */
+/******************************************************************************/
 
 /*
  *  Revision log:
@@ -19,57 +19,44 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include "linklist.h"
 
+int Help();
+
+#define CMD_MAX_LEN 128
 #define DESC_LEN    1024
-#define CMD_NUM    10
+#define CMD_NUM     10
 
-typedef struct DataNode
+/* menu program */
+
+static tDataNode head[]=
 {
-    int     cmd;
-    char    desc[DESC_LEN];	
-    struct  DataNode *next;
-}tDataNode;
+    {"help","this is help cmd!",Help,&head[1]},
+    {"version","menu program v1.0",NULL,NULL}
+};
 
 main()
-{
-    tDataNode *head = NULL;
-    int i;
-    tDataNode *p = NULL;
-    for(i=0; i<CMD_NUM; i++)
-    {
-        p = (tDataNode*)malloc(sizeof(tDataNode));
-        p->cmd = i;
-        snprintf(p->desc,DESC_LEN,"This is %d cmd!",i);
-        p->next = head;
-        head = p;
-    }
-    printf("Menu List:\n");
-    p = head;
-    while(p != NULL)
-    {
-        printf("%d - %s\n",p->cmd,p->desc);
-        p = p->next;
-    }
+{	
     while(1)
     {
-        int cmd;
-        printf("Input a cmd number >");
-        scanf("%d",&cmd);
-        if(cmd >= CMD_NUM)
+        char cmd[CMD_MAX_LEN];
+        printf("Input a cmd string >");
+        scanf("%s",cmd);
+        tDataNode *p = FindCmd(head,cmd);
+        if(p == NULL)
         {
-            printf("This is a wrong cmd number!\n");
-            continue;    
+            printf("This is a wrong cmd!\n");
         }
-        p = head;
-        while(p != NULL)
-        { 
-            if(p->cmd == cmd)
-            {
-                printf("%d - %s\n",p->cmd,p->desc);
-                break;
-            }
-            p = p->next;
+        printf("%s - %s\n", p->cmd, p->desc);
+        if(p->handler != NULL)
+        {
+            p->handler();
         }
     }
 }
 
+int Help()
+{
+    ShowAllCmd(head);
+    return 0;
+}
