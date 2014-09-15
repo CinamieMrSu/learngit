@@ -42,10 +42,11 @@ main()
         char cmd[CMD_MAX_LEN];
         printf("Input a cmd string >");
         scanf("%s",cmd);
-        tDataNode *p = FindCmd(head,cmd);
+        tDataNode *p = FindCmd(head, cmd);
         if(p == NULL)
         {
             printf("This is a wrong cmd!\n");
+            continue;
         }
         printf("%s - %s\n", p->cmd, p->desc);
         if(p->handler != NULL)
